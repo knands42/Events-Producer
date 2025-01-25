@@ -173,3 +173,6 @@ cython_debug/
 # InteliJ
 .idea/
 .idea/workspace.xml
+
+# Gradle
+**/.gradle
