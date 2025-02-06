@@ -82,6 +82,9 @@ def produce_transaction(process_id):
     # Create a new producer instance for each process
     local_producer = Producer(producer_conf)
     
+    start_time = time.time()
+    records_sent = 0
+    
     while True:
         transaction = generate_transaction()
 
@@ -92,7 +95,16 @@ def produce_transaction(process_id):
                 value=json.dumps(transaction).encode('utf-8'),
                 on_delivery=delivery_report
             )
-            logger.info(f"Process {process_id} - Produced transaction: {transaction}")
+            records_sent += 1
+            
+            # Calculate throughput every second
+            elapsed_time = time.time() - start_time
+            if elapsed_time >= 1:
+                throughput = records_sent / elapsed_time
+                logger.info(f"Process {process_id} - Throughput: {throughput:.2f} records/sec")
+                records_sent = 0
+                start_time = time.time()
+                
             local_producer.flush()
         except Exception as e:
             logger.error(f"Error sending transaction: {e}")
