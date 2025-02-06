@@ -1,7 +1,7 @@
 import json
 import logging
 import random
-import threading
+import multiprocessing
 import time
 import uuid
 
@@ -78,41 +78,50 @@ def delivery_report(err, message):
         logger.info(f"Record {message.key()} successfully produced")
 
 
-def produce_transaction(thread_id):
+def produce_transaction(process_id):
+    # Create a new producer instance for each process
+    local_producer = Producer(producer_conf)
+    
     while True:
         transaction = generate_transaction()
 
         try:
-            producer.produce(
+            local_producer.produce(
                 topic=TOPIC_NAME,
                 key=transaction['userId'],
                 value=json.dumps(transaction).encode('utf-8'),
                 on_delivery=delivery_report
             )
-            logger.info(f"Thread {thread_id} - Produced transaction: {transaction}")
-            producer.flush()
+            logger.info(f"Process {process_id} - Produced transaction: {transaction}")
+            local_producer.flush()
         except Exception as e:
             logger.error(f"Error sending transaction: {e}")
 
 
-def producer_data_in_parallel(num_threads):
-    threads = []
+def producer_data_in_parallel(num_processes):
+    processes = []
 
     try:
-        for i in range(num_threads):
-            thread = threading.Thread(target=produce_transaction, args=(i,))
-            thread.daemon = True
-            thread.start()
-            threads.append(thread)
+        for i in range(num_processes):
+            process = multiprocessing.Process(target=produce_transaction, args=(i,))
+            process.daemon = True
+            process.start()
+            processes.append(process)
 
-        for thread in threads:
-            thread.join()
+        # Keep the main process running
+        while True:
+            time.sleep(1)
 
+    except KeyboardInterrupt:
+        logger.info("Shutting down producers...")
+        for process in processes:
+            process.terminate()
+            process.join()
     except Exception as e:
         logger.error(f'Error message: {e}')
 
 
 if __name__ == '__main__':
+    # This guard is required for multiprocessing on Windows
     create_topic(TOPIC_NAME)
-
     producer_data_in_parallel(3)
