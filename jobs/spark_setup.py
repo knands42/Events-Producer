@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StringType, DoubleType, LongType, StructField, StructType
 
-KAFKA_BROKERS = "localhost:29092,localhost:39092,localhost:49092"
+KAFKA_BROKERS = "kafka-broker-1:19092,kafka-broker-2:19092,kafka-broker-3:19092"
 SOURCE_TOPIC = "financial_transactions"
 AGGREGATES_TOPIC = "transaction_aggregates"
 ANOMALIES_TOPIC = "transaction_anomalies"

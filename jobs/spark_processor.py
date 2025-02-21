@@ -31,7 +31,7 @@ aggregate_df = (
     )
 )
 
-aggregates_query = (
+output_kafka = (
     aggregate_df.withColumn("key", col("merchantId").cast("string"))
     .withColumn("value", to_json(
         struct(
@@ -41,6 +41,10 @@ aggregates_query = (
         )
     ))
     .selectExpr("key", "value")
+)
+
+aggregates_query = (
+    output_kafka
     .writeStream.format("kafka")
     .outputMode("update")
     .option("kafka.bootstrap.servers", KAFKA_BROKERS)
@@ -48,4 +52,4 @@ aggregates_query = (
     .option("checkpointLocation", f"{CHECKPOINT_DIR}/aggregates")
 )
 
-aggregates_query.start()
+aggregates_query.start().awaitTermination()
