@@ -77,7 +77,6 @@ x-kafka-broker-base: &kafka-broker-base
         test: [ "CMD", "kafka-topics", "--botstrap-server", "localhost:9092", "--list" ]
         interval: 10s
         timeout: 5s
-        retry: 3s
 
 x-spark-common: &spark-common
     image: bitnami/spark:3.5.0
@@ -273,15 +272,18 @@ services:
         networks:
             - data-eng-kafka-spark-network
 
-volumes:
-    controller_data_1:
-    controller_data_2:
-    controller_data_3:
-    broker_data_1:
-    broker_data_2:
-    broker_data_3:
-
-
+    grafana:
+        image: grafana/grafana:latest
+        container_name: grafana
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./volumes/grafana-data:/var/lib/grafana
+            - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+            - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+        networks:
+            - data-eng-kafka-spark-network
+    
 networks:
     data-eng-kafka-spark-network:
         driver: bridge

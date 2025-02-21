@@ -8,7 +8,8 @@ kafka_stream = (sparkSession.readStream
                 .format("kafka")
                 .option('kafka.bootstrap.servers', KAFKA_BROKERS)
                 .option('subscribe', SOURCE_TOPIC)
-                .option('startingOffsets', 'earliest')
+                .option('startingOffsets', 'latest')
+                .option('failOnDataLoss', 'false')
                 ).load()
 
 transactions_df = (
