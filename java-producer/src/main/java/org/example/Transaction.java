@@ -13,8 +13,8 @@ public record Transaction(
         String location,
         String paymentMethod,
         boolean isInternational,
-        String currency
-) {
+        String currency) {
+
     private static final Random random = new Random();
 
     public static Transaction randomTransaction() {
@@ -28,7 +28,6 @@ public record Transaction(
                 random.nextBoolean() ? "NY, USA" : "LA, USA",
                 random.nextBoolean() ? "credit_card" : "debit_card",
                 random.nextBoolean(),
-                random.nextBoolean() ? "USD" : "EUR"
-        );
+                random.nextBoolean() ? "USD" : "EUR");
     }
 }

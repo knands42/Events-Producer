@@ -24,7 +24,6 @@ public class TransactionProducer {
     private static final int NUM_PARTITIONS = 5;
     private static final short REPLICATION_FACTOR = 3;
 
-
     public static void start() {
         createTopicIfNotExists();
 
@@ -43,12 +42,15 @@ public class TransactionProducer {
                         Transaction transaction = Transaction.randomTransaction();
                         String transactionJson = objectMapper.writeValueAsString(transaction);
 
-                        ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, transaction.transactionId(), transactionJson);
+                        ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC, transaction.transactionId(),
+                                transactionJson);
                         producer.send(record, (RecordMetadata metadata, Exception exception) -> {
                             if (exception != null) {
-                                logger.error("Failed to send record with key {} due to {}", record.key(), exception.getMessage());
+                                logger.error("Failed to send record with key {} due to {}", record.key(),
+                                        exception.getMessage());
                             } else {
-                                logger.info("Record with key {} sent to partition {} with offset {}", record.key(), metadata.partition(), metadata.offset());
+                                logger.info("Record with key {} sent to partition {} with offset {}", record.key(),
+                                        metadata.partition(), metadata.offset());
                             }
                         });
 
