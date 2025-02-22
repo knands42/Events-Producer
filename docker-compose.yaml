@@ -229,8 +229,6 @@ services:
                     - name: local-connect-clusters
                       url: http://connect:8083
 
-
-
     spark-master:
         <<: *spark-common
         command: bin/spark-class org.apache.spark.deploy.master.Master
