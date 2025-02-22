@@ -10,7 +10,7 @@ STATES_DIR = "/mnt/spark-state"
 
 sparkSession = (SparkSession.builder
          .appName("FinancialTransactionsProcessor")
-         .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0")
+         .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.postgresql:postgresql:42.2.18")
          .config("spark.sql.streaming.checkpointLocation", CHECKPOINT_DIR)
          .config("spark.sql.streaming.stateStore.stateStoreDir", STATES_DIR)
          .config("spark.sql.shuffle.partitions", 20)

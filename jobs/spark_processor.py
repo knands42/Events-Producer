@@ -1,7 +1,9 @@
 from pyspark.sql.functions import *
+from pyspark.sql import DataFrame
 
 from jobs.spark_setup import KAFKA_BROKERS, SOURCE_TOPIC, transaction_schema, AGGREGATES_TOPIC, CHECKPOINT_DIR, \
     sparkSession
+from jobs.postgres_writer import write_to_postgres
 
 # Read from Kafka
 kafka_stream = (sparkSession.readStream
@@ -32,6 +34,10 @@ aggregate_df = (
     )
 )
 
+# Write aggregates to PostgreSQL
+write_to_postgres(aggregate_df, "transaction_aggregates")
+
+# Write agrregates to Kafka
 output_kafka = (
     aggregate_df.withColumn("key", col("merchantId").cast("string"))
     .withColumn("value", to_json(

@@ -38,6 +38,11 @@ This project is designed for learning purposes and involves the following compon
     make pyspark-consumer
     ```
 
+5. **Access PostgreSQL**:
+    ```sh
+    make connect-postgres
+    ```
+
 ## Useful Links
 
 - [Kafka Topics](http://localhost:8080)
