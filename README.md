@@ -1,55 +1,45 @@
-# DataEngineering-1Billion-Rows-Per-Hour
+# Kafka Event Producer Template
 
-A project that simulates how to build a complete workflow to persist 1 billion rows per hour.
+A high-performance, plug-and-play Kafka event producer template designed to generate and stream large volumes of events to Kafka topics. This template provides a ready-to-use solution for applications that need to test or demonstrate Kafka event streaming at scale.
 
-## Project Overview
+## 🚀 Features
 
-This project is designed for learning purposes and involves the following components:
-- A Python producer sending data to Kafka
-- A Java producer sending data to Kafka
-- Data being consumed by Apache Spark
+-   **High Throughput**: Configured to handle high-volume event streaming
+-   **Easy Configuration**: Simple setup with Docker Compose
+-   **Monitoring**: Built-in monitoring with Prometheus and Grafana
+-   **Scalable**: Designed to be easily extended for custom event schemas and patterns
 
-## Steps Involved
+## 🛠️ Quick Start
 
-1. **Python Producer**: Generates and sends data to a Kafka topic.
-2. **Java Producer**: Generates and sends data to a Kafka topic.
-3. **Kafka**: Acts as the message broker to handle the data streams.
-4. **Apache Spark**: Consumes data from Kafka, processes it, and persists it.
+1. **Clone the repository**
 
-## How to Execute the Project
-
-1. **Boot the project**:
-   ```sh
-   docker compose up --build --force-recreate
-   ```
-
-2. **Run the Python Producer**:
     ```sh
-    make producer-python
+    git clone https://github.com/yourusername/events-producer-template.git
+    cd events-producer-template
     ```
 
-3. **Run the Java Producer**:
+2. **Start the infrastructure**
+
+    ```sh
+    docker compose up -d
+    ```
+
+3. **Run a producer**
     ```sh
     make producer-java
     ```
 
-4. **Run PySpark Consumer**:
-    ```sh
-    make pyspark-consumer
-    ```
+## 📊 Monitoring
 
-5. **Access PostgreSQL**:
-    ```sh
-    make connect-postgres
-    ```
+Access the following services (when running locally):
 
-## Useful Links
+| Service    | URL                                            | Credentials |
+| ---------- | ---------------------------------------------- | ----------- |
+| Kafka UI   | [http://localhost:8080](http://localhost:8080) | -           |
+| Grafana    | [http://localhost:3000](http://localhost:3000) | admin/admin |
+| Prometheus | [http://localhost:9090](http://localhost:9090) | -           |
 
-- [Kafka Topics](http://localhost:8080)
-- [Spark Jobs](http://localhost:4040)
-- [Grafana](http://localhost:3000)
-- [Prometheus](https://localhost:9090)
 
-## Credits
+---
 
-Tutorial made possible by following [1 Billion Records per Hour](https://www.youtube.com/watch?v=d6AFh31fO7Y&t=3s) Youtube channel
+Inspired by [1 Billion Records per Hour](https://www.youtube.com/watch?v=d6AFh31fO7Y) tutorial

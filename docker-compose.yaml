@@ -45,7 +45,7 @@ x-kafka-controller-base: &kafka-controller-base
     volumes:
         - ./volumes/jmx_exporter:/usr/share/jmx_exporter
     networks:
-        - data-eng-kafka-spark-network
+        - app-network
 
 x-kafka-broker-base: &kafka-broker-base
     image: apache/kafka:3.8.1
@@ -68,7 +68,7 @@ x-kafka-broker-base: &kafka-broker-base
             ' > /tmp/log4j.properties
             /etc/kafka/docker/run
     networks:
-        - data-eng-kafka-spark-network
+        - app-network
     depends_on:
         - kafka-controller-1
         - kafka-controller-2
@@ -85,19 +85,7 @@ x-spark-common: &spark-common
         - ./mnt/checkpoints:/mnt/spark-checkpoints
         - ./mnt/spark-state:/mnt/spark-state
     networks:
-        - data-eng-kafka-spark-network
-
-x-spark-worker: &spark-worker-image
-    <<: *spark-common
-    command: /bin/sh -c "sleep 30; bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077"
-    container_name: spark-worker-1
-    depends_on:
-        - spark-master
-    environment:
-        SPARK_MODE: worker
-        SPARK_WORKER_CORES: 2
-        SPARK_WORKER_MEMORY: 2g
-        SPARK_MASTER_URL: spark://spark-master:7077
+        - app-network
 
 services:
     kafka-controller-1:
@@ -190,7 +178,7 @@ services:
             - kafka-broker-2
             - kafka-broker-3
         networks:
-            - data-eng-kafka-spark-network
+            - app-network
         healthcheck:
             test: [ "CMD", "curl", "-f", "http://localhost:18081/subjects" ]
             interval: 30s
@@ -206,7 +194,7 @@ services:
         ports:
             - 8080:8080
         networks:
-            - data-eng-kafka-spark-network
+            - app-network
         depends_on:
             schema-registry:
                 condition: service_healthy
@@ -228,25 +216,7 @@ services:
                   clusters:
                     - name: local-connect-clusters
                       url: http://connect:8083
-
-    spark-master:
-        <<: *spark-common
-        command: bin/spark-class org.apache.spark.deploy.master.Master
-        container_name: spark-master
-        ports:
-            - "9190:8080"
-            - "7077:7077"
-            - "4040:4040"
-            - "8081:8081"
-
-    spark-worker-2:
-        container_name: spark-worker-2
-        <<: *spark-worker-image
-
-    spark-worker-3:
-        container_name: spark-worker-3
-        <<: *spark-worker-image
-
+    
     # Monitoring
     prometheus:
         image: prom/prometheus:v3.0.0
@@ -260,7 +230,7 @@ services:
             - kafka-broker-2
             - kafka-broker-3
         networks:
-            - data-eng-kafka-spark-network
+            - app-network
 
     alertmanager:
         image: prom/alertmanager:v0.27.0
@@ -268,7 +238,7 @@ services:
         ports:
             - "59093:9093"
         networks:
-            - data-eng-kafka-spark-network
+            - app-network
 
     grafana:
         image: grafana/grafana:latest
@@ -280,7 +250,7 @@ services:
             - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
             - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
         networks:
-            - data-eng-kafka-spark-network
+            - app-network
 
     postgres:
         image: postgres:17
@@ -288,16 +258,16 @@ services:
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: financial_data
+            POSTGRES_DB: app_db
         ports:
             - "5432:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
         networks:
-            - data-eng-kafka-spark-network
+            - app-network
     
 networks:
-    data-eng-kafka-spark-network:
+    app-network:
         driver: bridge
 
 volumes:
